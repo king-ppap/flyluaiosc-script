@@ -1,0 +1,7 @@
+# This repo only tracks specific FlyLuaIoSC script files.
+# Ignore everything by default so app binaries, logs, and key.data are never committed.
+/*
+!/.gitignore
+!/data/
+/data/*
+!/data/z_WWAGP_no_msfs.lua
