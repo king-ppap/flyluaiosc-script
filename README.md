@@ -18,9 +18,13 @@ does something useful on the desktop:
   turns it off). Handled via event-driven key callbacks so quick taps register
   instantly.
 - **TERR on ND** — push button, toggles its light on/off.
-- **BRK FAN** — maintained toggle switch; its light follows the switch position.
-- **Backlight** — panel text-label backlight and LED master brightness driven at
-  a fixed level (the live-sim brightness datarefs aren't available offline).
+- **BRK FAN** — maintained toggle switch; its ON light follows the switch position.
+- **A/SKID & N/W STRG** — maintained switch; lights the BRK FAN **HOT** light
+  while ON.
+- **Brightness** — the clock SET knob (keys 13 dim / 15 bright) steps the
+  backlight, LCD and LED brightness through 10 levels on a squared curve,
+  clamped at both ends (no wrap-around). LEDs never go below 100 so they stay
+  visible.
 
 ### Notes
 
@@ -30,6 +34,17 @@ does something useful on the desktop:
 - Button/lever indices (`keysmap[...]`) were found with the finder approach and
   inferred from the `CfgRpn()` numbers in the bundled sim profiles. If a control
   doesn't respond, its index is the first thing to re-check.
+- **AGP firmware V1.14 or newer.** `Wwagp.lua` expects device ID `0x158040CC`;
+  older firmware reports `3AEBEE64` and key callbacks are dropped
+  (`REG_KEY dropped` in `flyluaio.log`), so AUTO BRK / TERR / the knob stop working.
+- **Writes only on change.** FlyLuaIoSC blocks all writes to the device after
+  ≥30 writes/s for 10 s (`block all caches` in the log), so LEDs are sent only
+  when their value changes, with a full resend every 2 s.
+- **Expect some input delay.** Without MSFS, FlyLuaIoSC handles about one key
+  event every 0.5 s, and after a knob turn it keeps firing auto-repeat ("fast")
+  events for a while. The knob keys register a press callback only, so the
+  repeats don't run Lua, but buttons pressed right after a turn can still lag.
+  This is a FlyLuaIoSC limit, not the script.
 
 ## Install
 
